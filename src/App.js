@@ -22,46 +22,56 @@ const auth = firebase.auth();
 const firestore = firebase.firestore();
 
 function App() {
-  const[user] = useAuthState(auth);
+
+  const [user] = useAuthState(auth);
+
   return (
     <div className="App">
-      <header className>
-
+      <header>
+        <h1>⚛️🔥💬</h1>
+        <SignOut />
       </header>
 
       <section>
-        {user ? <ChatRoom/> : <SignIn />}
+        {user ? <ChatRoom /> : <SignIn />}
       </section>
+
     </div>
   );
 }
 
-function SignIn(){
+function SignIn() {
 
-  const useSignInWithGoogle = () =>{
+  const signInWithGoogle = () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     auth.signInWithPopup(provider);
   }
-  return(
-    <button onClick={useSignInWithGoogle}>Sign In with Google</button>
+
+  return (
+    <>
+      <button className="sign-in" onClick={signInWithGoogle}>Sign in with Google</button>
+      <p>Do not violate the community guidelines or you will be banned for life!</p>
+    </>
   )
+
 }
 
-function SignOut(){
+function SignOut() {
   return auth.currentUser && (
     <button className="sign-out" onClick={() => auth.signOut()}>Sign Out</button>
   )
 }
 
-function ChatRoom(){
-  
+
+function ChatRoom() {
   const dummy = useRef();
-  const messagesRef = firestore.collection('messages')
+  const messagesRef = firestore.collection('messages');
   const query = messagesRef.orderBy('createdAt').limit(25);
 
-  const [messages] = useCollectionData(query, {idField: 'id'})
+  const [messages] = useCollectionData(query, { idField: 'id' });
 
-  const[formValue, setFormValue ] = useState('')
+  const [formValue, setFormValue] = useState('');
+
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -76,38 +86,41 @@ function ChatRoom(){
     })
 
     setFormValue('');
-    
-    dummy.current.scrollIntoView({behavior : 'smooth'})
+    dummy.current.scrollIntoView({ behavior: 'smooth' });
   }
 
-  return(
-    <>
+  return (<>
     <main>
+
       {messages && messages.map(msg => <ChatMessage key={msg.id} message={msg} />)}
 
-      <div ref={dummy}></div>
+      <span ref={dummy}></span>
+
     </main>
 
     <form onSubmit={sendMessage}>
-      <input value={formValue} onChange={(e) => setFormValue(e.target.value)}/>
 
-      <button type="submit">✈️</button>
+      <input value={formValue} onChange={(e) => setFormValue(e.target.value)} placeholder="say something nice" />
+
+      <button type="submit" disabled={!formValue}>🕊️</button>
+
     </form>
-    </>
-  )
+  </>)
 }
 
-function ChatMessage(props){
-  const {text, uid, photoURL} = props.message;
 
-  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received'
+function ChatMessage(props) {
+  const { text, uid, photoURL } = props.message;
 
-  return (
+  const messageClass = uid === auth.currentUser.uid ? 'sent' : 'received';
+
+  return (<>
     <div className={`message ${messageClass}`}>
-      <img src ={photoURL} />
+      <img src={photoURL || 'https://api.adorable.io/avatars/23/abott@adorable.png'} />
       <p>{text}</p>
     </div>
-  )
+  </>)
 }
+
 
 export default App;
