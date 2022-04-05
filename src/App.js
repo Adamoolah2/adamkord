@@ -1,4 +1,5 @@
 import './App.css';
+import {useRef, useState} from 'react'
 
 import firebase from 'firebase/compat/app'; 
   import 'firebase/compat/firestore';
@@ -6,7 +7,6 @@ import firebase from 'firebase/compat/app';
 
 import {useAuthState, useSignInWithGoogle} from 'react-firebase-hooks/auth'
 import {useCollectionData} from 'react-firebase-hooks/firestore'
-import { useState } from 'react';
 
 firebase.initializeApp({
   apiKey: "AIzaSyCwQGcN3v-tSOhHuoDCkZJ0HwWSIGORC60",
@@ -55,7 +55,7 @@ function SignOut(){
 
 function ChatRoom(){
   
-  const dummy = useRef()
+  const dummy = useRef();
   const messagesRef = firestore.collection('messages')
   const query = messagesRef.orderBy('createdAt').limit(25);
 
